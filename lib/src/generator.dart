@@ -133,7 +133,7 @@ class Generator {
   List<List<int>> _toColumnFormat(Image imgSrc, int lineHeight) {
     final rgba32 = imgSrc.convert(format: Format.uint8, numChannels: 4, alpha: 256);
 
-     final Image image = Image.from(rgba32); // make a copy
+    final Image image = Image.from(rgba32); // make a copy
 
     // Determine new width: closest integer that is divisible by lineHeight
     final int widthPx = (image.width + lineHeight) - (image.width % lineHeight);
