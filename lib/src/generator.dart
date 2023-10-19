@@ -146,14 +146,14 @@ class Generator {
     int left = 0;
     final List<List<int>> blobs = [];
 
-    while (left < widthPx) {
-      // final Image slice = copyCrop(biggerImage, x: left, y: 0, width: lineHeight, height: heightPx);
-      // final Uint8List bytes = slice.getBytes(order: ChannelOrder.bgr);
-      final rgba32 = image.convert(format: Format.uint8, numChannels: 4, alpha: 255);
-      final imageBytes = rgba32.getBytes();
-      blobs.add(imageBytes);
-      left += lineHeight;
-    }
+    // while (left < widthPx) {
+    // final Image slice = copyCrop(biggerImage, x: left, y: 0, width: lineHeight, height: heightPx);
+    // final Uint8List bytes = slice.getBytes(order: ChannelOrder.bgr);
+    final rgba32 = image.convert(format: Format.uint8, numChannels: 4, alpha: 255);
+    final imageBytes = rgba32.getBytes();
+    blobs.add(imageBytes);
+    // left += lineHeight;
+    // }
 
     return blobs;
   }
