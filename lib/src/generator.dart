@@ -7,6 +7,7 @@
  */
 
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data' show Uint8List;
 import 'package:hex/hex.dart';
 import 'package:image/image.dart';
@@ -133,28 +134,29 @@ class Generator {
     final Image image = Image.from(imgSrc); // make a copy
 
     // Determine new width: closest integer that is divisible by lineHeight
-    final int widthPx = (image.width + lineHeight) - (image.width % lineHeight);
-    final int heightPx = image.height;
-
+    // final int widthPx = (image.width + lineHeight) - (image.width % lineHeight);
+    // final int heightPx = image.height;
+    // log("widthPx >> ${widthPx}");
+    // log("heightPx >> ${heightPx}");
     // Create a black bottom layer
-    final biggerImage = copyResize(image, width: widthPx, height: heightPx);
-    fill(biggerImage, color: ColorFloat16(0));
+    //  final biggerImage = copyResize(image, width: widthPx, height: heightPx);
+    // fill(biggerImage, color: ColorFloat16(0));
     // Insert source image into bigger one
     // drawImage(biggerImage, image, dstX: 0, dstY: 0);
-    compositeImage(biggerImage, image, dstX: 0, dstY: 0);
+    // compositeImage(biggerImage, image, dstX: 0, dstY: 0);
 
-    int left = 0;
+    // int left = 0;
     final List<List<int>> blobs = [];
 
-    while (left < widthPx) {
-      //  final Image slice = copyCrop(biggerImage, x: left, y: 0, width: lineHeight, height: heightPx);
-      // final Uint8List bytes = slice.getBytes(order: ChannelOrder.bgr);
-      final rgba32 = image.convert(format: Format.uint8, numChannels: 4, alpha: 255);
-      final imageBytes = rgba32.getBytes();
+    // while (left < widthPx) {
+    //  final Image slice = copyCrop(biggerImage, x: left, y: 0, width: lineHeight, height: heightPx);
+    // final Uint8List bytes = slice.getBytes(order: ChannelOrder.bgr);
+    final rgba32 = image.convert(format: Format.uint8, numChannels: 4, alpha: 255);
+    final imageBytes = rgba32.getBytes();
 
-      blobs.add(imageBytes);
-      left += lineHeight;
-    }
+    blobs.add(imageBytes);
+    // left += lineHeight;
+    // }
 
     return blobs;
   }
@@ -547,12 +549,12 @@ class Generator {
     const bool highDensityHorizontal = true;
     const bool highDensityVertical = true;
 
-    invert(image);
-    flip(image, direction: FlipDirection.horizontal);
-    final Image imageRotated = copyRotate(image, angle: 270, interpolation: Interpolation.nearest);
+    // invert(image);
+    // flip(image, direction: FlipDirection.horizontal);
+    // final Image imageRotated = copyRotate(image, angle: 270, interpolation: Interpolation.nearest);
 
     const int lineHeight = highDensityVertical ? 3 : 1;
-    final List<List<int>> blobs = _toColumnFormat(imageRotated, lineHeight * 8);
+    final List<List<int>> blobs = _toColumnFormat(image, lineHeight * 8);
 
     // Compress according to line density
     // Line height contains 8 or 24 pixels of src image
@@ -562,7 +564,7 @@ class Generator {
       blobs[blobInd] = _packBitsIntoBytes(blobs[blobInd]);
     }
 
-    final int heightPx = imageRotated.height;
+    final int heightPx = image.height;
     const int densityByte = (highDensityHorizontal ? 1 : 0) + (highDensityVertical ? 32 : 0);
 
     final List<int> header = List.from(cBitImg.codeUnits);
