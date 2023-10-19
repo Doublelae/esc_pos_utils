@@ -139,7 +139,7 @@ class Generator {
 
     // Create a black bottom layer
     final biggerImage = copyResize(rgba32, width: widthPx, height: heightPx);
-    fill(biggerImage, color: ColorFloat16(0));
+    // fill(biggerImage, color: ColorFloat16(0));
     // Insert source image into bigger one
     // drawImage(biggerImage, image, dstX: 0, dstY: 0);
     
