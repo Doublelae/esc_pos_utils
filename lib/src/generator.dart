@@ -540,7 +540,7 @@ class Generator {
   /// Print an image using (ESC *) command
   ///
   /// [image] is an instanse of class from [Image library](https://pub.dev/packages/image)
-  List<int> image(Image imgSrc, {PosAlign align = PosAlign.center}) {
+  Uint8List image(Image imgSrc, {PosAlign align = PosAlign.center}) {
     List<int> bytes = [];
     // Image alignment
     bytes += setStyles(PosStyles().copyWith(align: align));
@@ -580,7 +580,7 @@ class Generator {
     // }
     // Reset line spacing: ESC 2 (HEX: 0x1b 0x32)
     bytes += [27, 50];
-    return bytes;
+    return blobs;
   }
 
   /// Print an image using (GS v 0) obsolete command
