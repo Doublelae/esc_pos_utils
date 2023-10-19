@@ -131,7 +131,7 @@ class Generator {
   /// [image] Image to extract from
   /// [lineHeight] Printed line height in dots
   List<List<int>> _toColumnFormat(Image imgSrc, int lineHeight) {
-    final rgba32 = imgSrc.convert(format: Format.uint8, numChannels: 4, alpha: 255);
+    final rgba32 = imgSrc.convert(format: Format.uint8, numChannels: 4, alpha: 256);
 
     // final Image image = Image.from(rgba32); // make a copy
 
