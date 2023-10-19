@@ -7,6 +7,7 @@
  */
 
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data' show Uint8List;
 import 'package:hex/hex.dart';
 import 'package:image/image.dart';
@@ -130,31 +131,32 @@ class Generator {
   /// [image] Image to extract from
   /// [lineHeight] Printed line height in dots
   List<List<int>> _toColumnFormat(Image imgSrc, int lineHeight) {
-    final Image image = Image.from(imgSrc); // make a copy
-    final rgba32 = image.convert(format: Format.uint8, numChannels: 4, alpha: 255);
+    final rgba32 = imgSrc.convert(format: Format.uint8, numChannels: 4, alpha: 255);
+
+    final Image image = Image.from(rgba32); // make a copy
 
     // Determine new width: closest integer that is divisible by lineHeight
-    final int widthPx = (rgba32.width + lineHeight) - (rgba32.width % lineHeight);
-    final int heightPx = rgba32.height;
+    final int widthPx = (image.width + lineHeight) - (image.width % lineHeight);
+    final int heightPx = image.height;
 
     // Create a black bottom layer
-    final biggerImage = copyResize(rgba32, width: widthPx, height: heightPx);
-    // fill(biggerImage, color: ColorFloat16(0));
+    final biggerImage = copyResize(image, width: widthPx, height: heightPx);
+    fill(biggerImage, color: ColorFloat16(0));
     // Insert source image into bigger one
     // drawImage(biggerImage, image, dstX: 0, dstY: 0);
-    
+
     compositeImage(biggerImage, image, dstX: 0, dstY: 0);
 
     int left = 0;
     final List<List<int>> blobs = [];
 
-     while (left < widthPx) {
-     final Image slice = copyCrop(biggerImage, x: left, y: 0, width: lineHeight, height: heightPx);
-     final Uint8List bytes = slice.getBytes();
-    blobs.add(bytes);
-     left += lineHeight;
-     }
-
+    while (left < widthPx) {
+      final Image slice = copyCrop(biggerImage, x: left, y: 0, width: lineHeight, height: heightPx);
+      final Uint8List bytes = slice.getBytes();
+      blobs.add(bytes);
+      left += lineHeight;
+    }
+    log("blobs >>> ${blobs}");
     return blobs;
   }
 
