@@ -130,7 +130,7 @@ class Generator {
   ///
   /// [image] Image to extract from
   /// [lineHeight] Printed line height in dots
-  List<List<int>> _toColumnFormat(Image imgSrc, int lineHeight) {
+  Uint8List _toColumnFormat(Image imgSrc, int lineHeight) {
     final Image image = Image.from(imgSrc); // make a copy
 
     // Determine new width: closest integer that is divisible by lineHeight
@@ -146,7 +146,7 @@ class Generator {
     // compositeImage(biggerImage, image, dstX: 0, dstY: 0);
 
     // int left = 0;
-    final List<List<int>> blobs = [];
+    // final List<List<int>> blobs = [];
 
     // while (left < widthPx) {
     //  final Image slice = copyCrop(biggerImage, x: left, y: 0, width: lineHeight, height: heightPx);
@@ -154,11 +154,11 @@ class Generator {
     final rgba32 = image.convert(format: Format.uint8, numChannels: 4, alpha: 255);
     final imageBytes = rgba32.getBytes();
 
-    blobs.add(imageBytes);
+    // blobs.add(imageBytes);
     // left += lineHeight;
     // }
 
-    return blobs;
+    return imageBytes;
   }
 
   /// Image rasterization
@@ -554,15 +554,15 @@ class Generator {
     // final Image imageRotated = copyRotate(image, angle: 270, interpolation: Interpolation.nearest);
 
     const int lineHeight = highDensityVertical ? 3 : 1;
-    final List<List<int>> blobs = _toColumnFormat(image, lineHeight * 8);
+    final Uint8List blobs = _toColumnFormat(image, lineHeight * 8);
 
     // Compress according to line density
     // Line height contains 8 or 24 pixels of src image
     // Each blobs[i] contains greyscale bytes [0-255]
     // const int pxPerLine = 24 ~/ lineHeight;
-    for (int blobInd = 0; blobInd < blobs.length; blobInd++) {
-      blobs[blobInd] = _packBitsIntoBytes(blobs[blobInd]);
-    }
+    // for (int blobInd = 0; blobInd < blobs.length; blobInd++) {
+    //   blobs[blobInd] = _packBitsIntoBytes(blobs[blobInd]);
+    // }
 
     final int heightPx = image.height;
     const int densityByte = (highDensityHorizontal ? 1 : 0) + (highDensityVertical ? 32 : 0);
@@ -573,11 +573,11 @@ class Generator {
 
     // Adjust line spacing (for 16-unit line feeds): ESC 3 0x10 (HEX: 0x1b 0x33 0x10)
     bytes += [27, 51, 16];
-    for (int i = 0; i < blobs.length; ++i) {
-      bytes += List.from(header)
-        ..addAll(blobs[i])
-        ..addAll('\n'.codeUnits);
-    }
+    // for (int i = 0; i < blobs.length; ++i) {
+    bytes += List.from(header)
+      ..addAll(blobs)
+      ..addAll('\n'.codeUnits);
+    // }
     // Reset line spacing: ESC 2 (HEX: 0x1b 0x32)
     bytes += [27, 50];
     return bytes;
