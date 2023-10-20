@@ -131,32 +131,33 @@ class Generator {
   /// [image] Image to extract from
   /// [lineHeight] Printed line height in dots
   List<List<int>> _toColumnFormat(Image imgSrc, int lineHeight) {
-    final rgba32 = imgSrc.convert(format: Format.uint8, numChannels: 4, alpha: 256);
+    final int widthPx = (imgSrc.width + lineHeight) - (imgSrc.width % lineHeight);
+    final int heightPx = imgSrc.height;
+    final biggerImage = copyResize(imgSrc, width: widthPx, height: heightPx);
+    final rgba32 = biggerImage.convert(format: Format.uint8, numChannels: 4, alpha: 255);
 
-    final Image image = Image.from(rgba32); // make a copy
+    // final Image image = Image.from(rgba32); // make a copy
 
     // Determine new width: closest integer that is divisible by lineHeight
-    final int widthPx = (image.width + lineHeight) - (image.width % lineHeight);
-    final int heightPx = image.height;
 
     // Create a black bottom layer
-    final biggerImage = copyResize(image, width: widthPx, height: heightPx);
-    fill(biggerImage, color: ColorFloat16(0));
+    // final biggerImage = copyResize(rgba32, width: widthPx, height: heightPx);
+    // fill(biggerImage, color: ColorUint8(0));
     // Insert source image into bigger one
-    // drawImage(biggerImage, image, dstX: 0, dstY: 0);
+    //  drawImage(biggerImage, image, dstX: 0, dstY: 0);
 
-    compositeImage(biggerImage, image, dstX: 0, dstY: 0);
+    //  compositeImage(biggerImage, rgba32, dstX: 0, dstY: 0);
 
     int left = 0;
     final List<List<int>> blobs = [];
 
     while (left < widthPx) {
-      final Image slice = copyCrop(biggerImage, x: left, y: 0, width: lineHeight, height: heightPx);
-      final Uint8List bytes = slice.getBytes();
+      //  final Image slice = copyCrop(imgSrc, x: left, y: 0, width: lineHeight, height: heightPx);
+      final Uint8List bytes = rgba32.getBytes();
       blobs.add(bytes);
       left += lineHeight;
     }
-    log("blobs >>> ${blobs}");
+    log("blobs >>> $blobs");
     return blobs;
   }
 
