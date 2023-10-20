@@ -130,7 +130,7 @@ class Generator {
   ///
   /// [image] Image to extract from
   /// [lineHeight] Printed line height in dots
-  Uint8List _toColumnFormat(Image imgSrc, int lineHeight) {
+  List<List<int>> _toColumnFormat(Image imgSrc, int lineHeight) {
     final int widthPx = (imgSrc.width + lineHeight) - (imgSrc.width % lineHeight);
     final int heightPx = imgSrc.height;
     // final biggerImage = copyResize(imgSrc, width: widthPx, height: heightPx);
@@ -158,7 +158,7 @@ class Generator {
     left += lineHeight;
     // }
     log("blobs >>> $blobs");
-    return bytes;
+    return blobs;
   }
 
   /// Image rasterization
@@ -194,6 +194,7 @@ class Generator {
 
   /// Merges each 8 values (bits) into one byte
   List<int> _packBitsIntoBytes(List<int> bytes) {
+    log(">>>>>>>>>>2");
     const pxPerLine = 8;
     final List<int> res = <int>[];
     const threshold = 127; // set the greyscale -> b/w threshold here
@@ -208,6 +209,7 @@ class Generator {
       }
       res.add(newVal ~/ 2);
     }
+    log(">>>>>>>>>>2 $res");
     return res;
   }
 
@@ -549,22 +551,23 @@ class Generator {
     const bool highDensityHorizontal = true;
     const bool highDensityVertical = true;
 
-    invert(imgSrc);
-    flip(imgSrc, direction: FlipDirection.horizontal);
-    final Image imageRotated = copyRotate(imgSrc, angle: 270, interpolation: Interpolation.nearest);
+    // invert(imgSrc);
+    // flip(imgSrc, direction: FlipDirection.horizontal);
+    // final Image imageRotated = copyRotate(imgSrc, angle: 270, interpolation: Interpolation.nearest);
 
     const int lineHeight = highDensityVertical ? 3 : 1;
-    final Uint8List blobs = _toColumnFormat(imageRotated, lineHeight * 8);
+    final List<List<int>> blobs = _toColumnFormat(imgSrc, lineHeight * 8);
 
     // Compress according to line density
     // Line height contains 8 or 24 pixels of src image
     // Each blobs[i] contains greyscale bytes [0-255]
     // const int pxPerLine = 24 ~/ lineHeight;
     // for (int blobInd = 0; blobInd < blobs.length; blobInd++) {
+    //   log(">>>>>>>>");
     //   blobs[blobInd] = _packBitsIntoBytes(blobs[blobInd]);
     // }
 
-    final int heightPx = imageRotated.height;
+    final int heightPx = imgSrc.height;
     const int densityByte = (highDensityHorizontal ? 1 : 0) + (highDensityVertical ? 32 : 0);
 
     final List<int> header = List.from(cBitImg.codeUnits);
@@ -575,7 +578,7 @@ class Generator {
     bytes += [27, 51, 16];
     for (int i = 0; i < blobs.length; ++i) {
       bytes += List.from(header)
-        ..addAll(blobs)
+        ..addAll(blobs[i])
         ..addAll('\n'.codeUnits);
     }
     // Reset line spacing: ESC 2 (HEX: 0x1b 0x32)
