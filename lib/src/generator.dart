@@ -133,8 +133,8 @@ class Generator {
   List<List<int>> _toColumnFormat(Image imgSrc, int lineHeight) {
     final int widthPx = (imgSrc.width + lineHeight) - (imgSrc.width % lineHeight);
     final int heightPx = imgSrc.height;
-    final biggerImage = copyResize(imgSrc, width: widthPx, height: heightPx);
-    final rgba32 = biggerImage.convert(format: Format.uint8, numChannels: 4, alpha: 255);
+    // final biggerImage = copyResize(imgSrc, width: widthPx, height: heightPx);
+    final rgba32 = imgSrc.convert(format: Format.uint8, numChannels: 4, alpha: 255);
 
     // final Image image = Image.from(rgba32); // make a copy
 
@@ -151,12 +151,12 @@ class Generator {
     int left = 0;
     final List<List<int>> blobs = [];
 
-    while (left < widthPx) {
+    // while (left < widthPx) {
       //  final Image slice = copyCrop(imgSrc, x: left, y: 0, width: lineHeight, height: heightPx);
       final Uint8List bytes = rgba32.getBytes();
       blobs.add(bytes);
       left += lineHeight;
-    }
+    // }
     log("blobs >>> $blobs");
     return blobs;
   }
